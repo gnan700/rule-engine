@@ -1,141 +1,133 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Eligibility Checker</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Rule Engine</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
             margin: 0;
             padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         h1 {
             text-align: center;
             color: #333;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin: 10px 0 5px;
         }
-        input[type="text"],
-        input[type="number"],
-        select {
+        input, select, textarea {
             width: 100%;
-            padding: 10px;
-            margin: 8px 0 20px 0;
+            padding: 8px;
+            margin: 5px 0 15px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 4px;
         }
         button {
             background-color: #28a745;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 10px;
+            border-radius: 4px;
             cursor: pointer;
             width: 100%;
-            font-size: 16px;
         }
         button:hover {
             background-color: #218838;
         }
         .result {
             margin-top: 20px;
-            padding: 15px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            display: none;
-        }
-        .result h2 {
-            margin: 0;
-        }
-        .error {
-            color: red;
+            font-size: 18px;
+            color: #333;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>User Eligibility Checker</h1>
-        <form id="eligibilityForm">
-            <label for="age">Age:</label>
-            <input type="number" id="age" name="age" required>
-
-            <label for="department">Department:</label>
-            <select id="department" name="department" required>
-                <option value="">Select Department</option>
-                <option value="Sales">Sales</option>
-                <option value="Marketing">Marketing</option>
-                <option value="IT">IT</option>
-                <option value="HR">HR</option>
-                <option value="Finance">Finance</option>
-            </select>
-
-            <label for="salary">Salary:</label>
-            <input type="number" id="salary" name="salary" required>
-
-            <label for="experience">Experience (years):</label>
-            <input type="number" id="experience" name="experience" required>
-
-            <button type="submit">Check Eligibility</button>
-        </form>
-        <div class="result" id="result">
-            <h2>Eligibility Results:</h2>
-            <p id="rule1Result"></p>
-            <p id="rule2Result"></p>
-        </div>
+        <h1>Eligibility Rule Engine</h1>
+        <label for="rule">Enter Rule:</label>
+        <textarea id="rule" rows="4" placeholder="age > 30 AND department = 'Sales'"></textarea>
+        
+        <button id="createRuleBtn">Create Rule</button>
+        
+        <h2>Evaluate Eligibility</h2>
+        <label for="age">Age:</label>
+        <input type="number" id="age" placeholder="Enter age">
+        
+        <label for="department">Department:</label>
+        <select id="department">
+            <option value="Sales">Sales</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Engineering">Engineering</option>
+            <option value="HR">HR</option>
+        </select>
+        
+        <label for="salary">Salary:</label>
+        <input type="number" id="salary" placeholder="Enter salary">
+        
+        <label for="experience">Experience (years):</label>
+        <input type="number" id="experience" placeholder="Enter experience">
+        
+        <button id="evaluateBtn">Evaluate Eligibility</button>
+        
+        <div class="result" id="result"></div>
     </div>
 
     <script>
-        document.getElementById('eligibilityForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
-
-            // Gather form data
-            const userData = {
-                age: parseInt(document.getElementById('age').value),
-                department: document.getElementById('department').value,
-                salary: parseFloat(document.getElementById('salary').value),
-                experience: parseInt(document.getElementById('experience').value)
-            };
-
-            // Make a POST request to evaluate eligibility
-            fetch('/evaluate', {
+        document.getElementById('createRuleBtn').addEventListener('click', async () => {
+            const ruleString = document.getElementById('rule').value;
+            const response = await fetch('/create_rule', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(userData)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Display the results
-                document.getElementById('result').style.display = 'block';
-                document.getElementById('rule1Result').innerText = data.rule1_eligible ? 'Eligible for Rule 1' : 'Not Eligible for Rule 1';
-                document.getElementById('rule2Result').innerText = data.rule2_eligible ? 'Eligible for Rule 2' : 'Not Eligible for Rule 2';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('rule1Result').innerText = 'An error occurred while checking eligibility.';
-                document.getElementById('rule2Result').innerText = '';
-                document.getElementById('result').style.display = 'block';
+                body: JSON.stringify({ rule_string: ruleString })
             });
+            const data = await response.json();
+            console.log(data); // Debugging output
+        });
+
+        document.getElementById('evaluateBtn').addEventListener('click', async () => {
+            const data = {
+                age: parseInt(document.getElementById('age').value),
+                department: document.getElementById('department').value,
+                salary: parseInt(document.getElementById('salary').value),
+                experience: parseInt(document.getElementById('experience').value),
+            };
+
+            // Make sure AST is properly set up or fetched from the earlier step
+            const ruleString = document.getElementById('rule').value;
+            const response = await fetch('/create_rule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ rule_string: ruleString })
+            });
+            const astData = await response.json();
+
+            const evalResponse = await fetch('/evaluate_rule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ast: astData, data: data })
+            });
+            const resultData = await evalResponse.json();
+
+            document.getElementById('result').innerText = `Eligibility: ${resultData.eligible}`;
         });
     </script>
 </body>
