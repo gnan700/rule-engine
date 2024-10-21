@@ -72,6 +72,14 @@ The application consists of a UI, an API, and a backend with a rule engine repre
  
  The application should be accessible at http://localhost:5000.
 
+3) **Run the Application**
+
+    After creating the codes, execute with:
+
+   "python app.py"
+
+The application should be accessible at http://localhost:5000.   
+
 ## Running the Application:
 1) Open your browser and go to http://127.0.0.1:5000/.
 2) Input a rule in the form (e.g., age > 30 AND department = 'Sales') and submit.
